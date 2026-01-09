@@ -1,5 +1,5 @@
 # MCSR API OpenAPI Specification
-This is an **Unofficial** OpenAPI specificaton for [MSCR's API](https://docs.mcsrranked.com)
+This is an **Unofficial** OpenAPI specificaton for [MCSR's API](https://docs.mcsrranked.com)
 
 
 ## TODOs
