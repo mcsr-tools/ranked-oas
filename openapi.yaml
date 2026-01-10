@@ -31,6 +31,8 @@ paths:
                   - achievements
                   - timestamp
                   - weeklyRaces
+                  - statistics
+                  - connections
                 properties:
                   uuid:
                     type: string
@@ -83,11 +85,15 @@ paths:
                       nextDecay:
                         $ref: "#/components/schemas/Date"
                         description: Date of user's next decay time
-                  # TODO: statistics
+                  statistics:
+                    $ref: "#/components/schemas/UserStatistics"
                   connections:
                     type: object
                     additionalProperties:
                       type: object
+                      required:
+                        - id
+                        - name
                       properties:
                         id:
                           type: string
@@ -195,7 +201,7 @@ paths:
                     type: object
                     description: Total Elo rate changes in a match between both players
                     additionalProperties:
-                      type: string      
+                      type: string
         default:
           $ref: "#/components/responses/errorResponse"
   /users/{identifier1}/versus/{identifier2}/matches:
@@ -228,7 +234,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/MatchInfo"          
+                  $ref: "#/components/schemas/MatchInfo"
         default:
           $ref: "#/components/responses/errorResponse"
   /users/{identifier}/seasons:
@@ -408,7 +414,8 @@ paths:
           $ref: "#/components/responses/errorResponse"
   /live:
     get:
-      description: 'Returns the online players count and live matches with public streams. You can activate public stream by follow this steps:
+      description:
+        'Returns the online players count and live matches with public streams. You can activate public stream by follow this steps:
         1. Link Twitch account with MCSR Ranked profile.
         2. Make Twitch to public on MCSR Ranked profile.
         3. Set "Public Stream" option in MCSR Ranked Settings.
@@ -446,26 +453,29 @@ paths:
                             $ref: "#/components/schemas/UserProfile"
                         data:
                           type: object
-                          required:
-                            - timeline
-                          properties:
-                            liveUrl:
-                              type: string
-                              description: Live stream url of player. it's null if player hasn't activated public stream.
-                            timeline:
-                              type: array
-                              items:
-                                type: object
-                                required:
-                                  - time
-                                  - type
-                                properties:
-                                  time:
-                                    $ref: "#/components/schemas/Time"
-                                    description: Match time of last player split update.
-                                  type:
-                                    type: string
-                                    description: Timeline idenfitier of last player split update.
+                          additionalProperties:
+                            type: object
+                            required:
+                              - timeline
+                            properties:
+                              liveUrl:
+                                type: string
+                                optional: true
+                                description: Live stream url of player. it's null if player hasn't activated public stream.
+                              timeline:
+                                oneOf:
+                                  - type: "null"
+                                  - type: object
+                                    required:
+                                      - time
+                                      - type
+                                    properties:
+                                      time:
+                                        $ref: "#/components/schemas/Time"
+                                        description: Match time of last player split update.
+                                      type:
+                                        type: string
+                                        description: Timeline idenfitier of last player split update.
         default:
           $ref: "#/components/responses/errorResponse"
   /leaderboard:
@@ -732,11 +742,11 @@ components:
       schema:
         type: integer
     seasonParam:
-          name: season
-          in: query
-          description: "Specific season match for statistics (default: current season number)"
-          schema:
-            type: integer
+      name: season
+      in: query
+      description: "Specific season match for statistics (default: current season number)"
+      schema:
+        type: integer
     identifierParam:
       name: identifier
       in: path
@@ -854,7 +864,7 @@ components:
           type: object
           description: Results of the match
           required:
-              - time
+            - time
           properties:
             uuid:
               type: string
@@ -916,7 +926,7 @@ components:
                 type: string
                 description: VOD url of this match with vod owner
               startsAt:
-                $ref: "#/components/schemas/Date" 
+                $ref: "#/components/schemas/Date"
                 # TODO: Format this better
                 description: VOD start date. you can get a timestamp with {date} - {vod[].startsAt}
         completions:
@@ -993,11 +1003,11 @@ components:
         - type: string
           title: id
           description: UUID with no dashes
-          pattern: '^[0-9a-fA-F]{32}$'
+          pattern: "^[0-9a-fA-F]{32}$"
         - type: string
           title: id
           description: UUID with dashes
-          pattern: '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-5][0-9a-fA-F]{3}-[089ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$'
+          pattern: "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-5][0-9a-fA-F]{3}-[089ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
         - type: string
           title: id
           description: Discord ID of User
@@ -1030,6 +1040,74 @@ components:
         country:
           type: string
           description: User's country code in a lowercased ISO 3166-1 alpha-2 format
+    StatisticsPairNullable:
+      type: object
+      required:
+        - ranked
+        - casual
+      properties:
+        ranked:
+          oneOf:
+            - type: integer
+            - type: "null"
+        casual:
+          oneOf:
+            - type: integer
+            - type: "null"
+    StatisticsPairRequired:
+      type: object
+      required:
+        - ranked
+        - casual
+      properties:
+        ranked:
+          type: integer
+        casual:
+          type: integer
+    Statistics:
+      type: object
+      required:
+        - bestTime
+        - highestWinStreak
+        - currentWinStreak
+        - playedMatches
+        - playtime
+        - completionTime
+        - forfeits
+        - completions
+        - wins
+        - loses
+      properties:
+        bestTime:
+          $ref: "#/components/schemas/StatisticsPairNullable"
+        highestWinStreak:
+          $ref: "#/components/schemas/StatisticsPairRequired"
+        currentWinStreak:
+          $ref: "#/components/schemas/StatisticsPairRequired"
+        playedMatches:
+          $ref: "#/components/schemas/StatisticsPairRequired"
+        playtime:
+          $ref: "#/components/schemas/StatisticsPairRequired"
+        completionTime:
+          $ref: "#/components/schemas/StatisticsPairRequired"
+        forfeits:
+          $ref: "#/components/schemas/StatisticsPairRequired"
+        completions:
+          $ref: "#/components/schemas/StatisticsPairRequired"
+        wins:
+          $ref: "#/components/schemas/StatisticsPairRequired"
+        loses:
+          $ref: "#/components/schemas/StatisticsPairRequired"
+    UserStatistics:
+      type: object
+      required:
+        - season
+        - total
+      properties:
+        season:
+          $ref: "#/components/schemas/Statistics"
+        total:
+          $ref: "#/components/schemas/Statistics"
     seasonResult:
       type: object
       required:
@@ -1077,7 +1155,7 @@ components:
                 description: Elo rate at phase ended
               eloRank:
                 type: integer
-                description: 	Elo rank at phase ended
+                description: Elo rank at phase ended
               point:
                 type: integer
                 description: Phase reword point
