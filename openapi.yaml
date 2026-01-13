@@ -1,8 +1,8 @@
 openapi: 3.0.0
 info:
   version: 1.0.0
-  title: Unofficial MCSR Ranked API
-  description: Community maintained unofficial Open API spec for the MCSR Ranked public API
+  title: MCSR Ranked API
+  description: Community maintained **unofficial** Open API spec for the MCSR Ranked public API
 servers:
   - url: https://mcsrranked.com/api
   - url: https://api.mcsrranked.com
