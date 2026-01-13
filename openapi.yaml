@@ -16,148 +16,46 @@ paths:
       parameters:
         - $ref: "#/components/parameters/identifierParam"
         - $ref: "#/components/parameters/seasonParam"
-          description: the season
       responses:
         "200":
-          description: Ok
           content:
             application/json:
               schema:
-                type: object
-                required:
-                  - uuid
-                  - nickname
-                  - roleType
-                  - achievements
-                  - timestamp
-                  - weeklyRaces
-                  - statistics
-                  - connections
-                properties:
-                  uuid:
-                    type: string
-                    description: UUID (without Dashes)
-                  nickname:
-                    type: string
-                  roleType:
-                    type: integer
-                  eloRate:
-                    type: integer
-                    description: Elo rate of current season, If user haven't finished placement matches it will be null
-                  eloRank:
-                    type: integer
-                    description: rank of current season
-                  country:
-                    type: string
-                    description: country code with lowercased ISO 3166-1 alpha-2 format
-                  achievements:
-                    type: object
+                allOf:
+                  - $ref: "#/components/responses/Success"
+                  - type: object
                     required:
-                      - display
-                      - total
+                      - data
                     properties:
-                      display:
-                        type: array
-                        description: A list of achievements to be displayed ingame
-                        items:
-                          $ref: "#/components/schemas/Achievement"
-                      total:
-                        type: array
-                        description: A list of user's every achievements that are not displayed ingame
-                        items:
-                          $ref: "#/components/schemas/Achievement"
-                  timestamp:
-                    type: object
-                    required:
-                      - firstOnline
-                      - lastOnline
-                      - lastRanked
-                    properties:
-                      firstOnline:
-                        $ref: "#/components/schemas/Date"
-                        description: Date of user's first connection
-                      lastOnline:
-                        $ref: "#/components/schemas/Date"
-                        description: Date of user's last connection
-                      lastRanked:
-                        $ref: "#/components/schemas/Date"
-                        description: Date of user's last ranked match
-                      nextDecay:
-                        $ref: "#/components/schemas/Date"
-                        description: Date of user's next decay time
-                  statistics:
-                    $ref: "#/components/schemas/UserStatistics"
-                  connections:
-                    type: object
-                    additionalProperties:
-                      type: object
-                      required:
-                        - id
-                        - name
-                      properties:
-                        id:
-                          type: string
-                        name:
-                          type: string
-                  seasonResult:
-                    $ref: "#/components/schemas/seasonResult"
-                  weeklyRaces:
-                    type: array
-                    items:
-                      type: object
-                      required:
-                        - id
-                        - time
-                        - rank
-                      properties:
-                        id:
-                          type: integer
-                          description: ID of the weekly race
-                        time:
-                          $ref: "#/components/schemas/Time"
-                          description: Final time of the weekly race
-                        rank:
-                          type: integer
-                          description: Rank in the weekly race
-        default:
-          $ref: "#/components/responses/errorResponse"
+                      data:
+                        $ref: "#/components/schemas/UserData"
   /users/{identifier}/matches:
     get:
-      description: Returns the {identifier}'s entire profile data.
+      description: Returns the {identifier}'s recent matches.
       parameters:
         - $ref: "#/components/parameters/identifierParam"
         - $ref: "#/components/parameters/beforeParam"
         - $ref: "#/components/parameters/afterParam"
-        - name: sort
-          in: query
-          description: "Match list sort option"
-          schema:
-            type: string
-            default: newest
-            enum:
-              - newest
-              - oldest
-              - fastest
-              - slowest
+        - $ref: "#/components/parameters/sortParam"
         - $ref: "#/components/parameters/countParam"
         - $ref: "#/components/parameters/typeParam"
         - $ref: "#/components/parameters/seasonParam"
-        - name: excludeddecay
-          in: query
-          description: "Whether exclude decayed matches (default: false)"
-          schema:
-            type: boolean
+        - $ref: "#/components/parameters/excludeDecayParam"
       responses:
         "200":
-          description: Ok
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/MatchInfo"
-        default:
-          $ref: "#/components/responses/errorResponse"
+                allOf:
+                  - $ref: "#/components/responses/Success"
+                  - type: object
+                    required:
+                      - data
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/MatchInfo"
   /users/{identifier1}/versus/{identifier2}:
     get:
       description: Returns the match stats between {identifier1} and {identifier2} for ranked/casual matches. If there's no match between both users, 400 error will returned.
@@ -202,13 +100,10 @@ paths:
                     description: Total Elo rate changes in a match between both players
                     additionalProperties:
                       type: string
-        default:
-          $ref: "#/components/responses/errorResponse"
   /users/{identifier1}/versus/{identifier2}/matches:
     get:
       description: Returns the recent matches between {identifier1} and {identifier2}.
       parameters:
-        - $ref: "#/components/parameters/identifierParam"
         - name: identifier1
           in: path
           description: Identifier of the user to fetch
@@ -232,11 +127,16 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/MatchInfo"
-        default:
-          $ref: "#/components/responses/errorResponse"
+                allOf:
+                  - $ref: "#/components/responses/Success"
+                  - type: object
+                    required:
+                      - data
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/MatchInfo"
   /users/{identifier}/seasons:
     get:
       description: Returns the {identifier}'s entire profile data.
@@ -272,8 +172,6 @@ paths:
                     description: country code with lowercased ISO 3166-1 alpha-2 format
                   seasonResult:
                     $ref: "#/components/schemas/seasonResult"
-        default:
-          $ref: "#/components/responses/errorResponse"
   /users/{identifier}/live:
     get:
       description: Returns real-time match data from the Private Room the player is in. To access this data, a `Private-Key` header is required. And, the player must be host or co-host of the Private Room.
@@ -361,8 +259,6 @@ paths:
                         time:
                           $ref: "#/components/schemas/Time"
                           description: Match time of timeline
-        default:
-          $ref: "#/components/responses/errorResponse"
   /matches:
     get:
       description: Returns the recent matches.
@@ -392,8 +288,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/MatchInfo"
-        default:
-          $ref: "#/components/responses/errorResponse"
   /matches/{match_id}:
     get:
       description: Returns the detailed match info.
@@ -410,8 +304,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MatchInfo"
-        default:
-          $ref: "#/components/responses/errorResponse"
   /live:
     get:
       description:
@@ -422,62 +314,65 @@ paths:
         4. Start your streaming on Twitch.'
       responses:
         "200":
-          description: Ok
           content:
             application/json:
               schema:
-                type: object
-                required:
-                  - players
-                  - liveMatches
-                properties:
-                  players:
-                    type: integer
-                    description: Concurrent players count who connected to MCSR Ranked server
-                  liveMatches:
-                    type: array
-                    items:
-                      type: object
-                      required:
-                        - currentTime
-                        - players
-                        - data
-                      properties:
-                        currentTime:
-                          $ref: "#/components/schemas/Time"
-                          description: Current time of the match
-                        players:
-                          type: array
-                          description: Only players with public stream activated will be included.
-                          items:
-                            $ref: "#/components/schemas/UserProfile"
-                        data:
-                          type: object
-                          additionalProperties:
-                            type: object
-                            required:
-                              - timeline
-                            properties:
-                              liveUrl:
-                                type: string
-                                optional: true
-                                description: Live stream url of player. it's null if player hasn't activated public stream.
-                              timeline:
-                                oneOf:
-                                  - type: "null"
-                                  - type: object
+                allOf:
+                  - $ref: "#/components/responses/Success"
+                  - type: object
+                    required:
+                      - data
+                    properties:
+                      data:
+                        type: object
+                        required:
+                          - players
+                          - liveMatches
+                        properties:
+                          players:
+                            type: integer
+                            description: Concurrent players count who connected to MCSR Ranked server
+                          liveMatches:
+                            type: array
+                            items:
+                              type: object
+                              required:
+                                - currentTime
+                                - players
+                                - data
+                              properties:
+                                currentTime:
+                                  $ref: "#/components/schemas/Time"
+                                  description: Current time of the match
+                                players:
+                                  type: array
+                                  description: Only players with public stream activated will be included.
+                                  items:
+                                    $ref: "#/components/schemas/UserProfile"
+                                data:
+                                  type: object
+                                  additionalProperties:
+                                    type: object
                                     required:
-                                      - time
-                                      - type
+                                      - timeline
                                     properties:
-                                      time:
-                                        $ref: "#/components/schemas/Time"
-                                        description: Match time of last player split update.
-                                      type:
+                                      liveUrl:
                                         type: string
-                                        description: Timeline idenfitier of last player split update.
-        default:
-          $ref: "#/components/responses/errorResponse"
+                                        description: Live stream url of player. it's null if player hasn't activated public stream.
+                                      timeline:
+                                        oneOf:
+                                          - type: "null"
+                                          - type: object
+                                            required:
+                                              - time
+                                              - type
+                                            properties:
+                                              time:
+                                                $ref: "#/components/schemas/Time"
+                                                description: Match time of last player split update.
+                                              type:
+                                                type: string
+                                                description: Timeline idenfitier of last player split update.
   /leaderboard:
     get:
       description: Returns Top 150 Leaderboard for Elo rates (it's not always 150 players due to same ranks)
@@ -532,8 +427,6 @@ paths:
                                 phasePoint:
                                   type: integer
                                   description: Final phase points of player in target season
-        default:
-          $ref: "#/components/responses/errorResponse"
   /phase-leaderboard:
     get:
       description: Returns Top 100 Phase Points Leaderboard for Current Season
@@ -607,8 +500,6 @@ paths:
                             predPhasePoint:
                               type: integer
                               description: Predicted phase points of player for next phase. It will be same value with `users[].seasonResult.phasePoint` if response is an past season.
-        default:
-          $ref: "#/components/responses/errorResponse"
   /record-leaderboard:
     get:
       description: Returns Top 100 Phase Points Leaderboard for Current Season
@@ -652,8 +543,6 @@ paths:
                       $ref: "#/components/schemas/UserProfile"
                     seed:
                       $ref: "#/components/schemas/MatchSeed"
-        default:
-          $ref: "#/components/responses/errorResponse"
   /weekly-race/{id?}:
     get:
       description: Returns Weekly Race info and leaderboard
@@ -715,8 +604,6 @@ paths:
                           $ref: "#/components/schemas/Time"
                         replayExist:
                           type: boolean
-        default:
-          $ref: "#/components/responses/errorResponse"
 components:
   parameters:
     countParam:
@@ -741,6 +628,22 @@ components:
       description: Cursor of match list, it must be match ID. get matches after than ID.
       schema:
         type: integer
+    sortParam:
+      in: query
+      description: "Match list sort option"
+      schema:
+        type: string
+        default: newest
+        enum:
+          - newest
+          - oldest
+          - fastest
+          - slowest
+    excludeDecayParam:
+      in: query
+      description: "Whether exclude decayed matches (default: false)"
+      schema:
+        type: boolean
     seasonParam:
       name: season
       in: query
@@ -761,7 +664,22 @@ components:
       schema:
         $ref: "#/components/schemas/MatchType"
   responses:
-    errorResponse:
+    Success:
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - status
+              - data
+            properties:
+              status:
+                type: string
+                enum:
+                  - success
+              data:
+                $ref: "#/components/schemas/AnyValue"
+    default:
       description: Generic status/data response, optionally filled out data giving more detail about the error
       content:
         application/problem+json:
@@ -773,12 +691,117 @@ components:
             properties:
               status:
                 type: string
-                description: The status or error information
+                enum:
+                  - error
               data:
-                type: string
-                description: What went wrong
-                nullable: true
+                oneOf:
+                  - type: object
+                    required:
+                      - error
+                    properties:
+                      error:
+                        type: string
+                  - $ref: "#/components/schemas/AnyValue"
   schemas:
+    UserData:
+      type: object
+      required:
+        - uuid
+        - nickname
+        - roleType
+        - achievements
+        - timestamp
+        - weeklyRaces
+        - statistics
+        - connections
+      properties:
+        uuid:
+          type: string
+          description: UUID (without Dashes)
+        nickname:
+          type: string
+        roleType:
+          type: integer
+        eloRate:
+          type: integer
+          description: Elo rate of current season, If user haven't finished placement matches it will be null
+        eloRank:
+          type: integer
+          description: rank of current season
+        country:
+          type: string
+          description: country code with lowercased ISO 3166-1 alpha-2 format
+        achievements:
+          type: object
+          required:
+            - display
+            - total
+          properties:
+            display:
+              type: array
+              description: A list of achievements to be displayed ingame
+              items:
+                $ref: "#/components/schemas/Achievement"
+            total:
+              type: array
+              description: A list of user's every achievements that are not displayed ingame
+              items:
+                $ref: "#/components/schemas/Achievement"
+        timestamp:
+          type: object
+          required:
+            - firstOnline
+            - lastOnline
+            - lastRanked
+          properties:
+            firstOnline:
+              $ref: "#/components/schemas/Date"
+              description: Date of user's first connection
+            lastOnline:
+              $ref: "#/components/schemas/Date"
+              description: Date of user's last connection
+            lastRanked:
+              $ref: "#/components/schemas/Date"
+              description: Date of user's last ranked match
+            nextDecay:
+              $ref: "#/components/schemas/Date"
+              description: Date of user's next decay time
+        statistics:
+          $ref: "#/components/schemas/UserStatistics"
+        connections:
+          type: object
+          additionalProperties:
+            type: object
+            required:
+              - id
+              - name
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+        seasonResult:
+          $ref: "#/components/schemas/seasonResult"
+        weeklyRaces:
+          type: array
+          items:
+            type: object
+            required:
+              - id
+              - time
+              - rank
+            properties:
+              id:
+                type: integer
+                description: ID of the weekly race
+              time:
+                $ref: "#/components/schemas/Time"
+                description: Final time of the weekly race
+              rank:
+                type: integer
+                description: Rank in the weekly race
+    AnyValue:
+      description: Can be any value - string, number, boolean, array or object.
     Achievement:
       type: object
       required:
@@ -992,9 +1015,16 @@ components:
           description: Noticable variations of the seed. it will be empty array if seed is not filtered.
     MatchType:
       type: integer
-      description: The type of match played
-      minimum: 1
-      maximum: 4
+      description: >
+        1. Casual
+        2. Ranked
+        3. Private
+        4. Event
+      enum:
+        - 1
+        - 2
+        - 3
+        - 4
     Time:
       type: integer
       description: Displays a specific duration in milliseconds
