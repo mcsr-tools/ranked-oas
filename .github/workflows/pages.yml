@@ -18,6 +18,9 @@ jobs:
           spec-file: ./openapi.yaml
           version: 5.31.0
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: |
+          INDEX_HTML=$(find swagger-ui -name index.html | head -n 1)
+          sed -i 's|</head>|<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-themes@1.4.3/themes/gruvbox.css" />\n</head>|' "$INDEX_HTML"
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
