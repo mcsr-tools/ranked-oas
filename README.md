@@ -13,7 +13,6 @@ Community maintained **unofficial** [MCSR Ranked REST API](https://docs.mcsrrank
 - Make `/live` status an enum
 - Fix descriptions and add missing descriptions to certian ref objects
 - Verify common tools support OpenAPI `3.1.0` and upgrade to that, since certain features (like descriptions on ref objects) are not supported in `3.0.0`
-- Make some note or enforcement of the rate limit of "500 requests per 10 minutes unless otherwise specified"
 
 ### MCSR API TODOs
 
