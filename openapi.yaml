@@ -1,14 +1,18 @@
 openapi: 3.0.0
 info:
   version: 1.0.0
-  title: MCSR Ranked API
-  description: Community maintained **unofficial** Open API spec for the MCSR Ranked public API
+  title: MCSR Ranked REST API
+  description: |-
+    Community maintained **unofficial** MCSR Ranked REST API OAS.
+
+    The API has a default rate limit of **500 requests per 10 minutes** unless otherwise specified.
+    If you want to use API Key with expanded ratelimit, please make a #ticket in the official [MCSR Ranked Discord Server](https://mcsrranked.com/discord).
   contact:
     name: MCSR Tools
     email: contact@mcsr.tools
 servers:
-  - url: https://mcsrranked.com/api
   - url: https://api.mcsrranked.com
+  - url: https://mcsrranked.com/api
 externalDocs:
   url: https://docs.mcsrranked.com
   description: Additional information can be found in the official docs
@@ -33,6 +37,10 @@ paths:
                     properties:
                       data:
                         $ref: "#/components/schemas/UserData"
+        "429":
+          $ref: "#/components/responses/RateLimitExceeded"
+        default:
+          $ref: "#/components/responses/default"
   /users/{identifier}/matches:
     get:
       description: Returns the {identifier}'s recent matches.
@@ -61,6 +69,10 @@ paths:
                         type: array
                         items:
                           $ref: "#/components/schemas/MatchInfo"
+        "429":
+          $ref: "#/components/responses/RateLimitExceeded"
+        default:
+          $ref: "#/components/responses/default"
   /users/{identifier1}/versus/{identifier2}:
     get:
       description: Returns the match stats between {identifier1} and {identifier2} for ranked/casual matches. If there's no match between both users, 400 error will returned.
@@ -105,6 +117,10 @@ paths:
                     description: Total Elo rate changes in a match between both players
                     additionalProperties:
                       type: string
+        "429":
+          $ref: "#/components/responses/RateLimitExceeded"
+        default:
+          $ref: "#/components/responses/default"
   /users/{identifier1}/versus/{identifier2}/matches:
     get:
       description: Returns the recent matches between {identifier1} and {identifier2}.
@@ -142,6 +158,10 @@ paths:
                         type: array
                         items:
                           $ref: "#/components/schemas/MatchInfo"
+        "429":
+          $ref: "#/components/responses/RateLimitExceeded"
+        default:
+          $ref: "#/components/responses/default"
   /users/{identifier}/seasons:
     get:
       description: Returns the {identifier}'s entire profile data.
@@ -177,6 +197,10 @@ paths:
                     description: country code with lowercased ISO 3166-1 alpha-2 format
                   seasonResult:
                     $ref: "#/components/schemas/seasonResult"
+        "429":
+          $ref: "#/components/responses/RateLimitExceeded"
+        default:
+          $ref: "#/components/responses/default"
   /users/{identifier}/live:
     get:
       description: Returns real-time match data from the Private Room the player is in. To access this data, a `Private-Key` header is required. And, the player must be host or co-host of the Private Room.
@@ -262,6 +286,10 @@ paths:
                         time:
                           type: integer
                           description: Match time of timeline
+        "429":
+          $ref: "#/components/responses/RateLimitExceeded"
+        default:
+          $ref: "#/components/responses/default"
   /matches:
     get:
       description: Returns the recent matches.
@@ -291,6 +319,10 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/MatchInfo"
+        "429":
+          $ref: "#/components/responses/RateLimitExceeded"
+        default:
+          $ref: "#/components/responses/default"
   /matches/{match_id}:
     get:
       description: Returns the detailed match info.
@@ -307,6 +339,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MatchInfo"
+        "429":
+          $ref: "#/components/responses/RateLimitExceeded"
+        default:
+          $ref: "#/components/responses/default"
   /live:
     get:
       description:
@@ -376,6 +412,10 @@ paths:
                                           type:
                                             type: string
                                             description: Timeline identifier of last player split update.
+        "429":
+          $ref: "#/components/responses/RateLimitExceeded"
+        default:
+          $ref: "#/components/responses/default"
   /leaderboard:
     get:
       description: Returns Top 150 Leaderboard for Elo rates (it's not always 150 players due to same ranks)
@@ -428,6 +468,10 @@ paths:
                                 phasePoint:
                                   type: integer
                                   description: Final phase points of player in target season
+        "429":
+          $ref: "#/components/responses/RateLimitExceeded"
+        default:
+          $ref: "#/components/responses/default"
   /phase-leaderboard:
     get:
       description: Returns Top 100 Phase Points Leaderboard for Current Season
@@ -502,6 +546,10 @@ paths:
                             predPhasePoint:
                               type: integer
                               description: Predicted phase points of player for next phase. It will be same value with `users[].seasonResult.phasePoint` if response is an past season.
+        "429":
+          $ref: "#/components/responses/RateLimitExceeded"
+        default:
+          $ref: "#/components/responses/default"
   /record-leaderboard:
     get:
       description: Returns Top 100 Phase Points Leaderboard for Current Season
@@ -545,6 +593,10 @@ paths:
                       $ref: "#/components/schemas/UserProfile"
                     seed:
                       $ref: "#/components/schemas/MatchSeed"
+        "429":
+          $ref: "#/components/responses/RateLimitExceeded"
+        default:
+          $ref: "#/components/responses/default"
   /weekly-race:
     get:
       description: Returns current Weekly Race info and leaderboard
@@ -599,6 +651,10 @@ paths:
                           $ref: "#/components/schemas/Time"
                         replayExist:
                           type: boolean
+        "429":
+          $ref: "#/components/responses/RateLimitExceeded"
+        default:
+          $ref: "#/components/responses/default"
   /weekly-race/{id}:
     get:
       description: Returns specific Weekly Race info and leaderboard
@@ -660,6 +716,10 @@ paths:
                           $ref: "#/components/schemas/Time"
                         replayExist:
                           type: boolean
+        "429":
+          $ref: "#/components/responses/RateLimitExceeded"
+        default:
+          $ref: "#/components/responses/default"
 components:
   parameters:
     countParam:
@@ -738,6 +798,25 @@ components:
                   - success
               data:
                 $ref: "#/components/schemas/AnyValue"
+    RateLimitExceeded:
+      description: Too many requests
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - status
+              - data
+            properties:
+              status:
+                type: string
+                enum:
+                  - error
+              data:
+                allOf:
+                  - $ref: "#/components/schemas/ErrorData"
+                example:
+                  error: Too many requests.
     default:
       description: Generic status/data response, optionally filled out data giving more detail about the error
       content:
@@ -754,12 +833,7 @@ components:
                   - error
               data:
                 oneOf:
-                  - type: object
-                    required:
-                      - error
-                    properties:
-                      error:
-                        type: string
+                  - $ref: "#/components/schemas/ErrorData"
                   - $ref: "#/components/schemas/AnyValue"
   schemas:
     UserData:
@@ -856,6 +930,13 @@ components:
                 description: Rank in the weekly race
     AnyValue:
       description: Can be any value - string, number, boolean, array or object.
+    ErrorData:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
     Achievement:
       type: object
       required:
