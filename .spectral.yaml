@@ -1,0 +1,7 @@
+extends: ["spectral:oas", "spectral:asyncapi", "spectral:arazzo"]
+overrides:
+  - files:
+      - openapi.yaml
+    rules:
+      operation-tags: off
+      operation-operationId: off
