@@ -66,9 +66,7 @@ paths:
                       - data
                     properties:
                       data:
-                        type: array
-                        items:
-                          $ref: "#/components/schemas/MatchInfo"
+                        $ref: "#/components/schemas/MatchesData"
         "429":
           $ref: "#/components/responses/RateLimitExceeded"
         default:
@@ -96,27 +94,14 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                required:
-                  - players
-                  - results
-                  - changes
-                properties:
-                  players:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/UserProfile"
-                  # results:
-                  #   type: object
-                  #   description: total is just matches count, otherwise are win count of specific player (UUID)
-                  #   additionalProperties:
-                  #     type: string
-                  #   # TODO: properties
-                  changes:
-                    type: object
-                    description: Total Elo rate changes in a match between both players
-                    additionalProperties:
-                      type: string
+                allOf:
+                  - $ref: "#/components/responses/Success"
+                  - type: object
+                    required:
+                      - data
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/UsersVersusData"
         "429":
           $ref: "#/components/responses/RateLimitExceeded"
         default:
@@ -155,9 +140,7 @@ paths:
                       - data
                     properties:
                       data:
-                        type: array
-                        items:
-                          $ref: "#/components/schemas/MatchInfo"
+                        $ref: "#/components/schemas/MatchesData"
         "429":
           $ref: "#/components/responses/RateLimitExceeded"
         default:
@@ -173,30 +156,14 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                required:
-                  - uuid
-                  - nickname
-                  - roleType
-                properties:
-                  uuid:
-                    type: string
-                    description: UUID (without Dashes)
-                  nickname:
-                    type: string
-                  roleType:
-                    type: integer
-                  eloRate:
-                    type: integer
-                    description: Elo rate of current season, If user haven't finished placement matches it will be null
-                  eloRank:
-                    type: integer
-                    description: rank of current season
-                  country:
-                    type: string
-                    description: country code with lowercased ISO 3166-1 alpha-2 format
-                  seasonResult:
-                    $ref: "#/components/schemas/seasonResult"
+                allOf:
+                  - $ref: "#/components/responses/Success"
+                  - type: object
+                    required:
+                      - data
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/UserSeasonsData"
         "429":
           $ref: "#/components/responses/RateLimitExceeded"
         default:
@@ -218,74 +185,14 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                required:
-                  - type
-                  - status
-                  - time
-                  - players
-                  - spectators
-                  - timelines
-                  - completions
-                properties:
-                  last:
-                    type: integer
-                    description: Match ID of previous match. All data will be reset when the match has ended. You can get previous match data with this.
-                  type:
-                    $ref: "#/components/schemas/MatchType"
-                  status:
-                    type: string
-                    enum:
-                      - idle
-                      - counting
-                      - generate
-                      - ready
-                      - running
-                      - done
-                  time:
-                    type: integer
-                    description: It will be 0 if match has not started.
-                  players:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/UserProfile"
-                  spectators:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/UserProfile"
-                    description: List of players spectating the game
-                  timelines:
-                    type: array
-                    items:
-                      type: object
-                      required:
-                        - uuid
-                        - time
-                        - type
-                      properties:
-                        uuid:
-                          type: string
-                          description: Player uuid of timeline
-                        time:
-                          type: integer
-                          description: Match time of timeline
-                        type:
-                          type: string
-                          description: Identifier of timeline
-                  completions:
-                    type: array
-                    items:
-                      type: object
-                      required:
-                        - uuid
-                        - time
-                      properties:
-                        uuid:
-                          type: string
-                          description: Player uuid of timeline
-                        time:
-                          type: integer
-                          description: Match time of timeline
+                allOf:
+                  - $ref: "#/components/responses/Success"
+                  - type: object
+                    required:
+                      - data
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/UsersLiveData"
         "429":
           $ref: "#/components/responses/RateLimitExceeded"
         default:
@@ -316,9 +223,14 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/MatchInfo"
+                allOf:
+                  - $ref: "#/components/responses/Success"
+                  - type: object
+                    required:
+                      - data
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/MatchesData"
         "429":
           $ref: "#/components/responses/RateLimitExceeded"
         default:
@@ -338,7 +250,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/MatchInfo"
+                allOf:
+                  - $ref: "#/components/responses/Success"
+                  - type: object
+                    required:
+                      - data
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/MatchData"
         "429":
           $ref: "#/components/responses/RateLimitExceeded"
         default:
@@ -364,54 +283,7 @@ paths:
                       - data
                     properties:
                       data:
-                        type: object
-                        required:
-                          - players
-                          - liveMatches
-                        properties:
-                          players:
-                            type: integer
-                            description: Concurrent players count who connected to MCSR Ranked server
-                          liveMatches:
-                            type: array
-                            items:
-                              type: object
-                              required:
-                                - currentTime
-                                - players
-                                - data
-                              properties:
-                                currentTime:
-                                  type: integer
-                                  description: Current time of the match
-                                players:
-                                  type: array
-                                  description: Only players with public stream activated will be included.
-                                  items:
-                                    $ref: "#/components/schemas/UserProfile"
-                                data:
-                                  type: object
-                                  additionalProperties:
-                                    type: object
-                                    required:
-                                      - timeline
-                                    properties:
-                                      liveUrl:
-                                        type: string
-                                        description: Live stream url of player. it's null if player hasn't activated public stream.
-                                      timeline:
-                                        type: object
-                                        nullable: true
-                                        required:
-                                          - time
-                                          - type
-                                        properties:
-                                          time:
-                                            type: integer
-                                            description: Match time of last player split update.
-                                          type:
-                                            type: string
-                                            description: Timeline identifier of last player split update.
+                        $ref: "#/components/schemas/LiveMatchesData"
         "429":
           $ref: "#/components/responses/RateLimitExceeded"
         default:
@@ -432,42 +304,14 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                required:
-                  - startsAt
-                  - endsAt
-                  - number
-                  - users
-                properties:
-                  startsAt:
-                    $ref: "#/components/schemas/Date"
-                  endsAt:
-                    $ref: "#/components/schemas/Date"
-                  users:
-                    type: array
-                    items:
-                      allOf:
-                        - $ref: "#/components/schemas/UserProfile"
-                        - type: object
-                          required:
-                            - seasonResult
-                          properties:
-                            seasonResult:
-                              type: object
-                              required:
-                                - eloRate
-                                - eloRank
-                                - phasePoint
-                              properties:
-                                eloRate:
-                                  type: integer
-                                  description: Final Elo rate of player in target season
-                                eloRank:
-                                  type: integer
-                                  description: Final Elo rank of player in target season
-                                phasePoint:
-                                  type: integer
-                                  description: Final phase points of player in target season
+                allOf:
+                  - $ref: "#/components/responses/Success"
+                  - type: object
+                    required:
+                      - data
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/LeaderboardData"
         "429":
           $ref: "#/components/responses/RateLimitExceeded"
         default:
@@ -494,58 +338,14 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                required:
-                  - phase
-                  - users
-                properties:
-                  phase:
-                    type: object
+                allOf:
+                  - $ref: "#/components/responses/Success"
+                  - type: object
                     required:
-                      - endsAt
-                      - number
-                      - season
+                      - data
                     properties:
-                      endsAt:
-                        type: number
-                        nullable: true
-                        description: Date of season ends. If target season is not current season it will be null
-                      number:
-                        type: integer
-                        nullable: true
-                        description: Current phase number of the season. If target season is not current season it will be null
-                      season:
-                        type: integer
-                        description: The season of this phase
-                  users:
-                    type: array
-                    items:
-                      allOf:
-                        - $ref: "#/components/schemas/UserProfile"
-                        - type: object
-                          required:
-                            - seasonResult
-                            - predPhasePoint
-                          properties:
-                            seasonResult:
-                              type: object
-                              required:
-                                - eloRate
-                                - eloRank
-                                - phasePoint
-                              properties:
-                                eloRate:
-                                  type: integer
-                                  description: Final Elo rate of player in target season
-                                eloRank:
-                                  type: integer
-                                  description: Final Elo rank of player in target season
-                                phasePoint:
-                                  type: integer
-                                  description: Final phase points of player in target season
-                            predPhasePoint:
-                              type: integer
-                              description: Predicted phase points of player for next phase. It will be same value with `users[].seasonResult.phasePoint` if response is an past season.
+                      data:
+                        $ref: "#/components/schemas/PhaseLeaderboardData"
         "429":
           $ref: "#/components/responses/RateLimitExceeded"
         default:
@@ -567,32 +367,14 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: object
-                  required:
-                    - rank
-                    - season
-                    - date
-                    - id
-                    - time
-                    - user
-                    - seed
-                  properties:
-                    rank:
-                      type: integer
-                    season:
-                      type: integer
-                    date:
-                      $ref: "#/components/schemas/Date"
-                    id:
-                      type: integer
-                    time:
-                      type: integer
-                    user:
-                      $ref: "#/components/schemas/UserProfile"
-                    seed:
-                      $ref: "#/components/schemas/MatchSeed"
+                allOf:
+                  - $ref: "#/components/responses/Success"
+                  - type: object
+                    required:
+                      - data
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/RecordLeaderboardData"
         "429":
           $ref: "#/components/responses/RateLimitExceeded"
         default:
@@ -606,51 +388,14 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                required:
-                  - id
-                  - seed
-                  - endsAt
-                  - leaderboard
-                properties:
-                  id:
-                    type: integer
-                  seed:
-                    type: object
+                allOf:
+                  - $ref: "#/components/responses/Success"
+                  - type: object
                     required:
-                      - overworld
-                      - nether
-                      - theEnd
-                      - rng
+                      - data
                     properties:
-                      overworld:
-                        type: string
-                      nether:
-                        type: string
-                      theEnd:
-                        type: string
-                      rng:
-                        type: string
-                  endsAt:
-                    $ref: "#/components/schemas/Date"
-                  leaderboard:
-                    type: array
-                    items:
-                      type: object
-                      required:
-                        - rank
-                        - player
-                        - time
-                        - replayExist
-                      properties:
-                        rank:
-                          type: integer
-                        player:
-                          $ref: "#/components/schemas/UserProfile"
-                        time:
-                          $ref: "#/components/schemas/Time"
-                        replayExist:
-                          type: boolean
+                      data:
+                        $ref: "#/components/schemas/WeeklyRaceData"
         "429":
           $ref: "#/components/responses/RateLimitExceeded"
         default:
@@ -671,51 +416,14 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                required:
-                  - id
-                  - seed
-                  - endsAt
-                  - leaderboard
-                properties:
-                  id:
-                    type: integer
-                  seed:
-                    type: object
+                allOf:
+                  - $ref: "#/components/responses/Success"
+                  - type: object
                     required:
-                      - overworld
-                      - nether
-                      - theEnd
-                      - rng
+                      - data
                     properties:
-                      overworld:
-                        type: string
-                      nether:
-                        type: string
-                      theEnd:
-                        type: string
-                      rng:
-                        type: string
-                  endsAt:
-                    $ref: "#/components/schemas/Date"
-                  leaderboard:
-                    type: array
-                    items:
-                      type: object
-                      required:
-                        - rank
-                        - player
-                        - time
-                        - replayExist
-                      properties:
-                        rank:
-                          type: integer
-                        player:
-                          $ref: "#/components/schemas/UserProfile"
-                        time:
-                          $ref: "#/components/schemas/Time"
-                        replayExist:
-                          type: boolean
+                      data:
+                        $ref: "#/components/schemas/WeeklyRaceData"
         "429":
           $ref: "#/components/responses/RateLimitExceeded"
         default:
@@ -836,6 +544,304 @@ components:
                   - $ref: "#/components/schemas/ErrorData"
                   - $ref: "#/components/schemas/AnyValue"
   schemas:
+    UsersLiveData:
+      type: object
+      required:
+        - type
+        - status
+        - time
+        - players
+        - spectators
+        - timelines
+        - completions
+      properties:
+        last:
+          type: integer
+          description: Match ID of previous match. All data will be reset when the match has ended. You can get previous match data with this.
+        type:
+          $ref: "#/components/schemas/MatchType"
+        status:
+          type: string
+          enum:
+            - idle
+            - counting
+            - generate
+            - ready
+            - running
+            - done
+        time:
+          type: integer
+          description: It will be 0 if match has not started.
+        players:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserProfile"
+        spectators:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserProfile"
+          description: List of players spectating the game
+        timelines:
+          type: array
+          items:
+            $ref: "#/components/schemas/LiveTimelineData"
+        completions:
+          type: array
+          items:
+            $ref: "#/components/schemas/LiveCompletionData"
+    UsersVersusData:
+      type: object
+      required:
+        - players
+        - results
+        - changes
+      properties:
+        players:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserProfile"
+        results:
+          $ref: "#/components/schemas/VersusResultsData"
+        changes:
+          $ref: "#/components/schemas/VersusChangesData"
+    MatchesData:
+      type: array
+      items:
+        $ref: "#/components/schemas/MatchInfo"
+    MatchData:
+      $ref: "#/components/schemas/MatchInfo"
+    UserSeasonsData:
+      allOf:
+        - $ref: "#/components/schemas/UserProfile"
+        - type: object
+          required:
+            - seasonResults
+          properties:
+            seasonResults:
+              type: object
+              additionalProperties:
+                $ref: "#/components/schemas/SeasonResult"
+    LiveMatchesData:
+      type: object
+      required:
+        - players
+        - liveMatches
+      properties:
+        players:
+          type: integer
+          description: Concurrent players count who connected to MCSR Ranked server
+        liveMatches:
+          type: array
+          items:
+            $ref: "#/components/schemas/LiveMatch"
+    LiveMatch:
+      type: object
+      required:
+        - currentTime
+        - players
+        - data
+      properties:
+        currentTime:
+          type: integer
+          description: Current time of the match
+        players:
+          type: array
+          description: Only players with public stream activated will be included.
+          items:
+            $ref: "#/components/schemas/UserProfile"
+        data:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/LiveMatchPlayerData"
+    LiveMatchPlayerData:
+      type: object
+      required:
+        - timeline
+      properties:
+        liveUrl:
+          type: string
+          description: Live stream url of player. it's null if player hasn't activated public stream.
+        timeline:
+          allOf:
+            - $ref: "#/components/schemas/LiveMatchTimeline"
+          nullable: true
+    LiveMatchTimeline:
+      type: object
+      required:
+        - time
+        - type
+      properties:
+        time:
+          type: integer
+          description: Match time of last player split update.
+        type:
+          type: string
+          description: Timeline identifier of last player split update.
+    LeaderboardData:
+      type: object
+      required:
+        - startsAt
+        - endsAt
+        - number
+        - users
+      properties:
+        startsAt:
+          $ref: "#/components/schemas/Date"
+        endsAt:
+          $ref: "#/components/schemas/Date"
+        number:
+          type: integer
+        users:
+          type: array
+          items:
+            $ref: "#/components/schemas/LeaderboardUser"
+    LeaderboardUser:
+      allOf:
+        - $ref: "#/components/schemas/UserProfile"
+        - type: object
+          required:
+            - seasonResult
+          properties:
+            seasonResult:
+              $ref: "#/components/schemas/LeaderboardSeasonResult"
+    LeaderboardSeasonResult:
+      type: object
+      required:
+        - eloRate
+        - eloRank
+        - phasePoint
+      properties:
+        eloRate:
+          type: integer
+          description: Final Elo rate of player in target season
+        eloRank:
+          type: integer
+          description: Final Elo rank of player in target season
+        phasePoint:
+          type: integer
+          description: Final phase points of player in target season
+    PhaseLeaderboardData:
+      type: object
+      required:
+        - phase
+        - users
+      properties:
+        phase:
+          $ref: "#/components/schemas/PhaseInfo"
+        users:
+          type: array
+          items:
+            $ref: "#/components/schemas/PhaseLeaderboardUser"
+    PhaseInfo:
+      type: object
+      required:
+        - endsAt
+        - number
+        - season
+      properties:
+        endsAt:
+          type: number
+          nullable: true
+          description: Date of season ends. If target season is not current season it will be null
+        number:
+          type: integer
+          nullable: true
+          description: Current phase number of the season. If target season is not current season it will be null
+        season:
+          type: integer
+          description: The season of this phase
+    PhaseLeaderboardUser:
+      allOf:
+        - $ref: "#/components/schemas/UserProfile"
+        - type: object
+          required:
+            - seasonResult
+            - predPhasePoint
+          properties:
+            seasonResult:
+              $ref: "#/components/schemas/LeaderboardSeasonResult"
+            predPhasePoint:
+              type: integer
+              description: Predicted phase points of player for next phase. It will be same value with `users[].seasonResult.phasePoint` if response is an past season.
+    RecordLeaderboardData:
+      type: array
+      items:
+        $ref: "#/components/schemas/RecordLeaderboardItem"
+    RecordLeaderboardItem:
+      type: object
+      required:
+        - rank
+        - season
+        - date
+        - id
+        - time
+        - user
+        - seed
+      properties:
+        rank:
+          type: integer
+        season:
+          type: integer
+        date:
+          $ref: "#/components/schemas/Date"
+        id:
+          type: integer
+        time:
+          type: integer
+        user:
+          $ref: "#/components/schemas/UserProfile"
+        seed:
+          $ref: "#/components/schemas/MatchSeed"
+    WeeklyRaceData:
+      type: object
+      required:
+        - id
+        - seed
+        - endsAt
+        - leaderboard
+      properties:
+        id:
+          type: integer
+        seed:
+          $ref: "#/components/schemas/WeeklyRaceSeed"
+        endsAt:
+          $ref: "#/components/schemas/Date"
+        leaderboard:
+          type: array
+          items:
+            $ref: "#/components/schemas/WeeklyRaceLeaderboardItem"
+    WeeklyRaceSeed:
+      type: object
+      required:
+        - overworld
+        - nether
+        - theEnd
+        - rng
+      properties:
+        overworld:
+          type: string
+        nether:
+          type: string
+        theEnd:
+          type: string
+        rng:
+          type: string
+    WeeklyRaceLeaderboardItem:
+      type: object
+      required:
+        - rank
+        - player
+        - time
+        - replayExist
+      properties:
+        rank:
+          type: integer
+        player:
+          $ref: "#/components/schemas/UserProfile"
+        time:
+          $ref: "#/components/schemas/Time"
+        replayExist:
+          type: boolean
     UserData:
       type: object
       required:
@@ -865,69 +871,77 @@ components:
           type: string
           description: country code with lowercased ISO 3166-1 alpha-2 format
         achievements:
-          type: object
-          required:
-            - display
-            - total
-          properties:
-            display:
-              type: array
-              description: A list of achievements to be displayed ingame
-              items:
-                $ref: "#/components/schemas/Achievement"
-            total:
-              type: array
-              description: A list of user's every achievements that are not displayed ingame
-              items:
-                $ref: "#/components/schemas/Achievement"
+          $ref: "#/components/schemas/UserAchievementsData"
         timestamp:
-          type: object
-          required:
-            - firstOnline
-            - lastOnline
-            - lastRanked
-          properties:
-            firstOnline:
-              $ref: "#/components/schemas/Date"
-            lastOnline:
-              $ref: "#/components/schemas/Date"
-            lastRanked:
-              $ref: "#/components/schemas/Date"
-            nextDecay:
-              $ref: "#/components/schemas/Date"
+          $ref: "#/components/schemas/UserTimestampData"
         statistics:
           $ref: "#/components/schemas/UserStatistics"
         connections:
-          type: object
-          additionalProperties:
-            type: object
-            required:
-              - id
-              - name
-            properties:
-              id:
-                type: string
-              name:
-                type: string
+          $ref: "#/components/schemas/UserConnectionsData"
         seasonResult:
-          $ref: "#/components/schemas/seasonResult"
+          $ref: "#/components/schemas/SeasonResult"
         weeklyRaces:
           type: array
           items:
-            type: object
-            required:
-              - id
-              - time
-              - rank
-            properties:
-              id:
-                type: integer
-                description: ID of the weekly race
-              time:
-                $ref: "#/components/schemas/Time"
-              rank:
-                type: integer
-                description: Rank in the weekly race
+            $ref: "#/components/schemas/UserWeeklyRaceData"
+    UserAchievementsData:
+      type: object
+      required:
+        - display
+        - total
+      properties:
+        display:
+          type: array
+          description: A list of achievements to be displayed ingame
+          items:
+            $ref: "#/components/schemas/Achievement"
+        total:
+          type: array
+          description: A list of user's every achievements that are not displayed ingame
+          items:
+            $ref: "#/components/schemas/Achievement"
+    UserTimestampData:
+      type: object
+      required:
+        - firstOnline
+        - lastOnline
+        - lastRanked
+      properties:
+        firstOnline:
+          $ref: "#/components/schemas/Date"
+        lastOnline:
+          $ref: "#/components/schemas/Date"
+        lastRanked:
+          $ref: "#/components/schemas/Date"
+        nextDecay:
+          $ref: "#/components/schemas/Date"
+    UserConnectionsData:
+      type: object
+      additionalProperties:
+        type: object
+        required:
+          - id
+          - name
+        properties:
+          id:
+            type: string
+          name:
+            type: string
+    UserWeeklyRaceData:
+      type: object
+      required:
+        - id
+        - time
+        - rank
+      properties:
+        id:
+          type: integer
+          description: ID of the weekly race
+        time:
+          $ref: "#/components/schemas/Time"
+        rank:
+          type: integer
+          description: Rank in the weekly race
     AnyValue:
       description: Can be any value - string, number, boolean, array or object.
     ErrorData:
@@ -1020,16 +1034,7 @@ components:
           nullable: true
           description: Seed id if it's ranked filtered seed. it's not real seed number of the seed. it will be null if it's decayed match.
         result:
-          type: object
-          description: Results of the match
-          required:
-            - time
-          properties:
-            uuid:
-              type: string
-              description: Winner's UUID, It will be null If match has draw
-            time:
-              $ref: "#/components/schemas/Time"
+          $ref: "#/components/schemas/MatchResultData"
         forfeited:
           type: boolean
           description: Whether match has no completions
@@ -1037,31 +1042,11 @@ components:
           type: boolean
           description: Whether match has decayed match
         rank:
-          type: object
-          description: Rank data about the match
-          properties:
-            season:
-              type: integer
-              description: Record rank of match's season
-            allTime:
-              type: integer
-              description: Record rank of all-time
+          $ref: "#/components/schemas/MatchRankData"
         changes:
           type: array
           items:
-            type: object
-            required:
-              - uuid
-            properties:
-              uuid:
-                type: string
-                description: UUID of player
-              change:
-                type: integer
-                description: Amount of change Elo rate, if match has placements it will be null
-              eloRate:
-                type: integer
-                description: Elo rate of player, if match has placements it will be null
+            $ref: "#/components/schemas/MatchChangeData"
         tag:
           type: string
           description: Special tag of this match. It's used by get matches with tag
@@ -1071,54 +1056,148 @@ components:
         vod:
           type: array
           items:
-            type: object
-            required:
-              - uuid
-              - url
-              - startsAt
-            properties:
-              uuid:
-                type: string
-                description: UUID of vod owner. Only players with public stream activated will be included
-              url:
-                type: string
-                description: VOD url of this match with vod owner
-              startsAt:
-                $ref: "#/components/schemas/Date"
+            $ref: "#/components/schemas/MatchVodData"
         completions:
           type: array
           items:
-            type: object
-            required:
-              - uuid
-              - time
-            properties:
-              uuid:
-                type: string
-                description: (Advanced) Player uuid of completion
-              time:
-                $ref: "#/components/schemas/Time"
+            $ref: "#/components/schemas/MatchCompletionData"
         timelines:
           type: array
           items:
-            type: object
-            required:
-              - uuid
-              - time
-              - type
-            properties:
-              uuid:
-                type: string
-                description: (Advanced) Player uuid of timeline
-              time:
-                type: integer
-                description: (Advanced) Match time of timeline
-              type:
-                type: string
-                description: (Advanced) Identifier of timeline
+            $ref: "#/components/schemas/MatchTimelineData"
         replayExist:
           type: boolean
           description: (Advanced) Whether match replay is exist in the server
+    MatchResultData:
+      type: object
+      description: Results of the match
+      required:
+        - time
+      properties:
+        uuid:
+          type: string
+          description: Winner's UUID, It will be null If match has draw
+        time:
+          $ref: "#/components/schemas/Time"
+    MatchRankData:
+      type: object
+      description: Rank data about the match
+      properties:
+        season:
+          type: integer
+          description: Record rank of match's season
+        allTime:
+          type: integer
+          description: Record rank of all-time
+    MatchChangeData:
+      type: object
+      required:
+        - uuid
+      properties:
+        uuid:
+          type: string
+          description: UUID of player
+        change:
+          type: integer
+          description: Amount of change Elo rate, if match has placements it will be null
+        eloRate:
+          type: integer
+          description: Elo rate of player, if match has placements it will be null
+    MatchVodData:
+      type: object
+      required:
+        - uuid
+        - url
+        - startsAt
+      properties:
+        uuid:
+          type: string
+          description: UUID of vod owner. Only players with public stream activated will be included
+        url:
+          type: string
+          description: VOD url of this match with vod owner
+        startsAt:
+          $ref: "#/components/schemas/Date"
+    MatchCompletionData:
+      type: object
+      required:
+        - uuid
+        - time
+      properties:
+        uuid:
+          type: string
+          description: (Advanced) Player uuid of completion
+        time:
+          $ref: "#/components/schemas/Time"
+    MatchTimelineData:
+      type: object
+      required:
+        - uuid
+        - time
+        - type
+      properties:
+        uuid:
+          type: string
+          description: (Advanced) Player uuid of timeline
+        time:
+          type: integer
+          description: (Advanced) Match time of timeline
+        type:
+          type: string
+          description: (Advanced) Identifier of timeline
+    LiveTimelineData:
+      type: object
+      required:
+        - uuid
+        - time
+        - type
+      properties:
+        uuid:
+          type: string
+          description: Player uuid of timeline
+        time:
+          type: integer
+          description: Match time of timeline
+        type:
+          type: string
+          description: Identifier of timeline
+    LiveCompletionData:
+      type: object
+      required:
+        - uuid
+        - time
+      properties:
+        uuid:
+          type: string
+          description: Player uuid of timeline
+        time:
+          type: integer
+          description: Match time of timeline
+    VersusResultsData:
+      type: object
+      required:
+        - ranked
+        - casual
+      description: Total is just matches count, otherwise win count of specific player (UUID)
+      properties:
+        ranked:
+          $ref: "#/components/schemas/VersusMatchStatsData"
+        casual:
+          $ref: "#/components/schemas/VersusMatchStatsData"
+    VersusMatchStatsData:
+      type: object
+      required:
+        - total
+      properties:
+        total:
+          type: number
+      additionalProperties:
+        type: string
+    VersusChangesData:
+      type: object
+      description: Total Elo rate changes in a match between both players
+      additionalProperties:
+        type: string
     MatchSeed:
       type: object
       description: Seed of a match
@@ -1265,7 +1344,7 @@ components:
           $ref: "#/components/schemas/Statistics"
         total:
           $ref: "#/components/schemas/Statistics"
-    seasonResult:
+    SeasonResult:
       type: object
       required:
         - last
