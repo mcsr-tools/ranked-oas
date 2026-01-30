@@ -5,6 +5,8 @@
 
 Community maintained **unofficial** [MCSR Ranked REST API](https://docs.mcsrranked.com) OAS. Useful for generating types, creating SDKs, documentation, etc. See [openapi.tools](https://openapi.tools) for more information.
 
+View [examples](https://github.com/mcsr-tools/ranked-oas/wiki/Examples) on how to generate useful code for your programming language of choice.
+
 ## TODOs
 
 - Ensure all nullable fields are documented
